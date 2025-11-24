@@ -40,7 +40,8 @@ public class EncryptWriter extends Writer {
 
     @Override
     public void write(String str, int off, int len) throws IOException {
-        char[] buf = str.substring(off, off + len).toCharArray();
+        char[] buf = new char[len];
+        str.getChars(off, off + len, buf, 0);
         encryptAndWrite(buf, 0, buf.length);
     }
 
