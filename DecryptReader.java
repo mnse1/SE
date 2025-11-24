@@ -3,42 +3,24 @@ import java.io.Reader;
 
 public class DecryptReader extends Reader {
     private final Reader in;
+    private final EncryptionStrategy strategy;
 
-    public DecryptReader(Reader in) {
+    public DecryptReader(Reader in, EncryptionStrategy strategy) {
         this.in = in;
+        this.strategy = strategy;
     }
 
-    // encrypt의 반대: 오른쪽으로 3글자 이동 (x->a, y->b, z->c, a->d ...)
-    private char decryptChar(char c) {
-        if ('a' <= c && c <= 'z') {
-            return (char) ('a' + (c - 'a' + 3) % 26);
-        } else if ('A' <= c && c <= 'Z') {
-            return (char) ('A' + (c - 'A' + 3) % 26);
-        } else {
-            return c;
-        }
-    }
-
-    @Override
-    public int read() throws IOException {
+    @Override public int read() throws IOException {
         int ch = in.read();
-        if (ch == -1) return -1;
-        return decryptChar((char) ch);
+        return (ch == -1) ? -1 : strategy.decrypt((char) ch);
     }
 
-    @Override
-    public int read(char[] cbuf, int off, int len) throws IOException {
+    @Override public int read(char[] cbuf, int off, int len) throws IOException {
         int n = in.read(cbuf, off, len);
         if (n == -1) return -1;
-
-        for (int i = 0; i < n; i++) {
-            cbuf[off + i] = decryptChar(cbuf[off + i]);
-        }
+        for (int i = 0; i < n; i++) cbuf[off + i] = strategy.decrypt(cbuf[off + i]);
         return n;
     }
 
-    @Override
-    public void close() throws IOException {
-        in.close();
-    }
+    @Override public void close() throws IOException { in.close(); }
 }
