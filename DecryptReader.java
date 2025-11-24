@@ -20,6 +20,13 @@ public class DecryptReader extends Reader {
     }
 
     @Override
+    public int read() throws IOException {
+        int ch = in.read();
+        if (ch == -1) return -1;
+        return decryptChar((char) ch);
+    }
+
+    @Override
     public int read(char[] cbuf, int off, int len) throws IOException {
         int n = in.read(cbuf, off, len);
         if (n == -1) return -1;
